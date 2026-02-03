@@ -1,0 +1,22 @@
+# Virtual Environment (The big one we talked about)
+.venv/
+venv/
+env/
+
+# Python leftovers (Compiled files)
+__pycache__/
+*.py[cod]
+
+# Multimedia (Don't upload your downloaded videos/music!)
+*.mp4
+*.mkv
+#*.mp3
+*.webm
+
+# Binaries
+*.exe
+ffmpeg.exe
+ffprobe.exe
+
+# Personal Configs (Only if you want users to make their own)
+# config.json
