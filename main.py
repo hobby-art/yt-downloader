@@ -7,55 +7,84 @@ from tkinter import filedialog
 ## FUNCTIONS
 
 
+# Function called by DOWNLOAD button.
 def start_download_thread() -> None:
-    # Function called by DOWNLOAD button.
 
     # Changing the state of DOWNLOAD button, to CANCEL button.
     download_button["text"] = "\nCANCEL\n"
     download_button["command"] = abort
 
-    # Disable text field.
-    input_field["state"] = "disabled"
+    # Reset counters for the donwload qeue
+    global qeue
+    qeue = 0
+    global counter
+    counter = 0
 
     # Validate text field input.
     text: str | None = input_field.get("1.0", "end-1c")
     urls: list[str] | None = None
     if text:
         urls = utils.input_check(text)
+        update_counter(None, len(urls))
+    else:
+        update_counter(None, 1)
 
     # Start a new thread for download process.
     thread = threading.Thread(
-        target=downloader.download, args=(end_download_thread, urls)
+        target=downloader.download,
+        args=(end_download_thread, update_text_field, update_counter, urls),
     )
     thread.daemon = True
     thread.start()
 
 
+# Receiving callback function after finishing downloading.
+# After finish - enable DOWNLOAD button.
 def end_download_thread() -> None:
-    # Receiving callback function after finishing downloading.
-    # After finish - enable DOWNLOAD button.
     window.after(0, enable_download_button)
 
 
+# Callback that gets text information from yt-dlp
+def update_text_field(data) -> None:
+    input_field.delete("1.0", "end")
+    input_field.insert("1.0", data)
+
+
+# Global counters for update_counter
+qeue = 0
+counter = 0
+
+
+# Callback to receive progress hooks
+def update_counter(hook, sum):
+    if sum:
+        global qeue
+        qeue = sum
+        label_counter_var.set(f"0/{sum}")
+    if hook:
+        if hook["status"] == "finished":
+            global counter
+            counter += 1
+            label_counter_var.set(f"{counter}/{qeue}")
+
+
+# Change the CANCEL button back into DOWNLOAD button.
 def enable_download_button() -> None:
-    # Change the CANCEL button back into DOWNLOAD button.
     download_button["text"] = "\nDOWNLOAD\n"
     download_button["command"] = start_download_thread
     input_field["state"] = "normal"
 
 
+# Function called if CANCEL button pressed.
 def abort() -> None:
-    # Function called if CANCEL button pressed.
     downloader.abort_requested = True
     download_button["text"] = "\nDOWNLOAD\n"
     download_button["command"] = start_download_thread
     input_field["state"] = "normal"
 
 
+# Function called when the checkbox "Audio only" pressed.
 def audio_checkbox() -> None:
-    # Function called when the checkbox "Audio only" pressed.
-    # If ON - disable quality selection widget and set the
-    # ydl_config option for downloading audio.
     current_quality = quality_selection_combobox.get()
     if is_only_audio.get():
         quality_selection_combobox["state"] = "disabled"
@@ -66,8 +95,8 @@ def audio_checkbox() -> None:
         selected_quality.set(current_quality)
 
 
+# Function called by "Choose folder" button.
 def select_folder() -> None:
-    # Function called by "Choose folder" button.
     selected_folder = filedialog.askdirectory()
     if select_folder:
         folder_var.set(selected_folder)
@@ -83,17 +112,30 @@ window.title("YT-DOWNLOADER")
 window.geometry("700x450")
 
 
-# Top label with instructions.
+# Lables frame for: instructions label, counter label.
+text_frame = ttk.Frame(window)
+
+# Label with instructions.
 label_instructions = ttk.Label(
-    master=window,
+    window,
     text="If the text field is empty, URL will be taked from the clipboard.\nOtherwise, you can paste several URLs separated by a new line.",
-    font="Calibri 15",
+    font="Calibri 12",
 )
+
+# Counter label
+label_counter_var = tk.StringVar(value="0/0")
+label_counter = ttk.Label(window, textvariable=label_counter_var, font="Calibri 12")
+
+# Text frame positioning
+label_instructions.pack()
+label_counter.pack()
+
+label_instructions.pack_propagate(False)
 label_instructions.pack()
 
 # Text field for URLs input.
 input_field = tk.Text(window, height=10)
-input_field.pack()
+input_field.pack(side="top")
 
 
 # Top frame for: download button, quality selection, audio only checkbox.

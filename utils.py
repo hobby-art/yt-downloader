@@ -37,7 +37,7 @@ def set_quality(selection: str) -> None:
 def log_entry(url: str, title: str) -> None:
     now = datetime.datetime.today()
     formatted_time = now.strftime("%Y-%m-%d %H:%M")
-    with open("history.txt", "a") as file:
+    with open("history.txt", "a", encoding="UTF-8") as file:
         file.write(formatted_time + ", " + '"' + title + '"' + ", " + url + "\n")
 
 
@@ -65,12 +65,9 @@ def get_config_value(key: str, default=None) -> str:
 
 
 # Formats urls from the text field into an array.
-def input_check(input: str) -> None | list[str]:
-    if not input:
-        return
-    else:
-        urls_list = input.splitlines()
-        return urls_list
+def input_check(input: str) -> list[str]:
+    urls_list = input.splitlines()
+    return urls_list
 
 
 if __name__ == "__main__":
