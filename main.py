@@ -4,8 +4,58 @@ from tkinter import ttk
 from tkinter import filedialog
 
 
-# Functions
-def disable_quality_selection():
+## FUNCTIONS
+
+
+def start_download_thread() -> None:
+    # Function called by DOWNLOAD button.
+
+    # Changing the state of DOWNLOAD button, to CANCEL button.
+    download_button["text"] = "\nCANCEL\n"
+    download_button["command"] = abort
+
+    # Disable text field.
+    input_field["state"] = "disabled"
+
+    # Validate text field input.
+    text: str | None = input_field.get("1.0", "end-1c")
+    urls: list[str] | None = None
+    if text:
+        urls = utils.input_check(text)
+
+    # Start a new thread for download process.
+    thread = threading.Thread(
+        target=downloader.download, args=(end_download_thread, urls)
+    )
+    thread.daemon = True
+    thread.start()
+
+
+def end_download_thread() -> None:
+    # Receiving callback function after finishing downloading.
+    # After finish - enable DOWNLOAD button.
+    window.after(0, enable_download_button)
+
+
+def enable_download_button() -> None:
+    # Change the CANCEL button back into DOWNLOAD button.
+    download_button["text"] = "\nDOWNLOAD\n"
+    download_button["command"] = start_download_thread
+    input_field["state"] = "normal"
+
+
+def abort() -> None:
+    # Function called if CANCEL button pressed.
+    downloader.abort_requested = True
+    download_button["text"] = "\nDOWNLOAD\n"
+    download_button["command"] = start_download_thread
+    input_field["state"] = "normal"
+
+
+def audio_checkbox() -> None:
+    # Function called when the checkbox "Audio only" pressed.
+    # If ON - disable quality selection widget and set the
+    # ydl_config option for downloading audio.
     current_quality = quality_selection_combobox.get()
     if is_only_audio.get():
         quality_selection_combobox["state"] = "disabled"
@@ -16,7 +66,8 @@ def disable_quality_selection():
         selected_quality.set(current_quality)
 
 
-def select_folder():
+def select_folder() -> None:
+    # Function called by "Choose folder" button.
     selected_folder = filedialog.askdirectory()
     if select_folder:
         folder_var.set(selected_folder)
@@ -24,44 +75,15 @@ def select_folder():
         utils.update_config("outtmpl", save_path)
 
 
-def start_download_thread():
-    download_button["text"] = "\nCANCEL\n"
-    download_button["command"] = abort
-
-    input_field["state"] = "disabled"
-
-    text = input_field.get("1.0", "end-1c")
-    urls = utils.input_check(text)
-    thread = threading.Thread(
-        target=downloader.download, args=(end_download_thread, urls)
-    )
-    thread.daemon = True
-    thread.start()
-
-
-def end_download_thread():
-    window.after(0, enable_download_button)
-
-
-def enable_download_button():
-    download_button["text"] = "\nDOWNLOAD\n"
-    download_button["command"] = start_download_thread
-    input_field["state"] = "normal"
-
-
-def abort():
-    downloader.abort_requested = True
-    download_button["text"] = "\nDOWNLOAD\n"
-    download_button["command"] = start_download_thread
-    input_field["state"] = "normal"
-
+## GUI
 
 # Main window
 window = tk.Tk()
 window.title("YT-DOWNLOADER")
 window.geometry("700x450")
 
-# Instructions label
+
+# Top label with instructions.
 label_instructions = ttk.Label(
     master=window,
     text="If the text field is empty, URL will be taked from the clipboard.\nOtherwise, you can paste several URLs separated by a new line.",
@@ -69,11 +91,12 @@ label_instructions = ttk.Label(
 )
 label_instructions.pack()
 
-# Text field
+# Text field for URLs input.
 input_field = tk.Text(window, height=10)
 input_field.pack()
 
-# Top frame: download button, quality selection, audio only checkbox
+
+# Top frame for: download button, quality selection, audio only checkbox.
 top_frame = ttk.Frame(window, width=650, height=80, borderwidth=10, relief=tk.GROOVE)
 
 # Download button
@@ -85,7 +108,16 @@ download_button = ttk.Button(
 )
 
 # Quality selection
-quality_options = ("144", "240", "360", "480", "720", "1080", "1440", "2160")
+quality_options: tuple[str, ...] = (
+    "144",
+    "240",
+    "360",
+    "480",
+    "720",
+    "1080",
+    "1440",
+    "2160",
+)
 
 selected_quality = tk.StringVar(value="1080")
 quality_selection_combobox = ttk.Combobox(
@@ -102,7 +134,7 @@ audio_only_checkbox = ttk.Checkbutton(
     top_frame,
     text="Audio only",
     variable=is_only_audio,
-    command=disable_quality_selection,
+    command=audio_checkbox,
 )
 
 # Top_frame positioning
@@ -113,7 +145,8 @@ audio_only_checkbox.pack(side="left")
 top_frame.pack_propagate(False)
 top_frame.pack(pady=10)
 
-# Middle frame: choose save path button, show selected path.
+
+# Middle frame for: choose save path button, show selected path label.
 middle_frame = ttk.Frame(window, width=650, height=50, borderwidth=10, relief=tk.GROOVE)
 
 # Select save folder button
@@ -128,9 +161,8 @@ path_button = ttk.Button(
     command=select_folder,
 )
 
-# Show selected folder
+# Show selected folder label
 path_label = ttk.Label(middle_frame, textvariable=folder_var)
-
 
 # Middle frame positioning
 path_button.pack(side="left")
@@ -139,7 +171,8 @@ path_label.pack(side="left", padx=50)
 middle_frame.pack_propagate(False)
 middle_frame.pack()
 
-# Bottom frame
+
+# Bottom frame for: "Download history" button, "Update yt-dlp" button
 bottom_frame = ttk.Frame(window, width=650, height=50, borderwidth=10, relief=tk.GROOVE)
 
 # History button
@@ -158,6 +191,7 @@ update_dlp_button.pack(side="right")
 
 bottom_frame.pack_propagate(False)
 bottom_frame.pack(pady=10)
+
 
 # Set defaults and start the mainloop
 utils.set_quality("1080")

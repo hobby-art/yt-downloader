@@ -1,15 +1,18 @@
 import os, json, datetime
 
 
-def open_history():
+# Function called by "Download history" button.
+def open_history() -> None:
     os.startfile("history.txt")
 
 
-def update_ydl():
+# Function called by "Update yt-dlp" button.
+def update_ydl() -> None:
     os.startfile("update_ydl.bat")
 
 
-def set_quality(selection):
+# Function used by quality selection combobox, audio_checkbox and setting the default quality after the launch.
+def set_quality(selection: str) -> None:
 
     match selection:
         case "144":
@@ -30,14 +33,16 @@ def set_quality(selection):
             update_config("format", "bestvideo+bestaudio/best")
 
 
-def log_entry(url, title):
+# Make an entry in the history.txt file after a successfull download.
+def log_entry(url: str, title: str) -> None:
     now = datetime.datetime.today()
     formatted_time = now.strftime("%Y-%m-%d %H:%M")
     with open("history.txt", "a") as file:
         file.write(formatted_time + ", " + '"' + title + '"' + ", " + url + "\n")
 
 
-def update_config(key, value):
+# Update ydl_config keys.
+def update_config(key, value) -> None:
     file = "ydl_config.json"
 
     with open(file, "r", encoding="UTF-8") as config_file:
@@ -49,8 +54,9 @@ def update_config(key, value):
         json.dump(data, config_file, indent=4)
 
 
-def get_config_value(key, default=None):
-    file = "ydl_config.json"
+# Get ydl_config option values.
+def get_config_value(key: str, default=None) -> str:
+    file: str = "ydl_config.json"
 
     with open(file, "r", encoding="UTF-8") as config_file:
         data = json.load(config_file)
@@ -58,8 +64,9 @@ def get_config_value(key, default=None):
     return data.get(key, default)
 
 
-def input_check(input):
-    if input == "":
+# Formats urls from the text field into an array.
+def input_check(input: str) -> None | list[str]:
+    if not input:
         return
     else:
         urls_list = input.splitlines()
