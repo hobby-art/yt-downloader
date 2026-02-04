@@ -37,7 +37,7 @@ def config_preparation(callback_update_text, update_counter) -> dict:
     with open("ydl_config.json", "r", encoding="UTF-8") as config:
         ydl_config = json.load(config)
         ydl_config["logger"] = MyLogger(callback_update_text)
-        ydl_config["progress_hooks"] = [lambda hook: update_counter(hook, None)]
+        ydl_config["postprocessor_hooks"] = [lambda hook: update_counter(hook, None)]
         return ydl_config
 
 

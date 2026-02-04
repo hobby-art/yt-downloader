@@ -58,22 +58,15 @@ counter = 0
 # Callback to receive progress hooks
 def update_counter(hook, sum):
     global counter
-    global filename
     if sum:
         global qeue
         qeue = sum
         label_counter_var.set(f"0/{qeue}")
     if hook:
-        if hook["status"] == "finished":
-            quality = selected_quality.get()
-            if (quality == "1080" or quality == "1440" or quality == "2160") and (
-                (
-                    hook["filename"].endswith(".webm")
-                    or hook["filename"].endswith(".m4a")
-                )
-                and not is_only_audio.get()
-            ):
-                return
+        if (
+            hook.get("postprocessor") == "MoveFiles"
+            and hook.get("status") == "finished"
+        ):
             counter += 1
             label_counter_var.set(f"{counter}/{qeue}")
 
