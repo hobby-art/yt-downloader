@@ -2,7 +2,7 @@
 A simple Python tool to download videos using `yt-dlp`.
 
 ## Setup Instructions
-1.	Install python 3.10 or higher. During installation check the box "Add Python to PATH".
+1.	Install python (project written in 3.14.2). During installation check the box "Add Python to PATH".
 2.	Download ffmpeg. For example, here: https://www.gyan.dev/ffmpeg/builds/. Look for the "Essentials" or "Full" zip.
 3.	Extract ffmpeg.exe and ffprobe.exe from the bin folder of the zip and drop them into the project folder.
 4.	In the project folder run start.bat. If you don’t have venv, it will create one and install dependencies from requirements.txt.
