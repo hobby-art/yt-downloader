@@ -17,4 +17,4 @@ if not exist ".venv" (
 echo [!] Launching program...
 python main.py
 
-pause
+::pause

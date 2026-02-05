@@ -25,9 +25,9 @@ def start_download_thread() -> None:
     urls: list[str] | None = None
     if text:
         urls = utils.input_check(text)
-        update_counter(None, len(urls))
+        initialize_counter(len(urls))
     else:
-        update_counter(None, 1)
+        initialize_counter(1)
 
     # Start a new thread for download process.
     thread = threading.Thread(
@@ -50,25 +50,24 @@ def update_text_field(data) -> None:
     input_field.insert("1.0", data)
 
 
-# Global counters for update_counter
+# Global variables for the counter
 qeue = 0
 counter = 0
 
 
-# Callback to receive progress hooks
-def update_counter(hook, sum):
+# Print the number of videos that are qeued for download
+def initialize_counter(sum):
+    global qeue
+    qeue = sum
+    label_counter_var.set(f"0/{qeue}")
+
+
+# Callback to receive postprocessor hooks to update the counter
+def update_counter(hook):
     global counter
-    if sum:
-        global qeue
-        qeue = sum
-        label_counter_var.set(f"0/{qeue}")
-    if hook:
-        if (
-            hook.get("postprocessor") == "MoveFiles"
-            and hook.get("status") == "finished"
-        ):
-            counter += 1
-            label_counter_var.set(f"{counter}/{qeue}")
+    if hook.get("postprocessor") == "MoveFiles" and hook.get("status") == "finished":
+        counter += 1
+        label_counter_var.set(f"{counter}/{qeue}")
 
 
 # Change the CANCEL button back into DOWNLOAD button.
