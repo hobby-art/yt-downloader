@@ -2,7 +2,6 @@ import json, pyperclip, utils
 from yt_dlp import YoutubeDL
 from playsound3 import playsound
 from typing import Callable
-import traceback
 
 
 abort_requested: bool = False
@@ -13,7 +12,7 @@ def download(
     end_thread: Callable[[], None],
     callback_update_text,
     update_counter,
-    urls: list[str] | None = None,
+    urls,
 ) -> None:
 
     global abort_requested

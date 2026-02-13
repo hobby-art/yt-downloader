@@ -38,6 +38,7 @@ def log_entry(url: str, title: str) -> None:
     now = datetime.datetime.today()
     formatted_time = now.strftime("%Y-%m-%d %H:%M")
     with open("history.txt", "a", encoding="UTF-8") as file:
+        # TODO: just make a csv file
         file.write(formatted_time + ", " + '"' + title + '"' + ", " + url + "\n")
 
 

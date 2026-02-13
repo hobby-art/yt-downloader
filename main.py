@@ -22,11 +22,11 @@ def start_download_thread() -> None:
 
     # Validate text field input.
     text: str | None = input_field.get("1.0", "end-1c")
-    urls: list[str] | None = None
     if text:
         urls = utils.input_check(text)
         initialize_counter(len(urls))
     else:
+        urls = None
         initialize_counter(1)
 
     # Start a new thread for download process.

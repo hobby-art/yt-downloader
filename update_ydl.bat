@@ -14,7 +14,7 @@ if not exist ".venv" (
 )
 
 :: Update yt-dlp using pip
-echo [!] Updating yt-dlp...
-python -m pip install -U yt-dlp
+echo Updating yt-dlp...
+python -m pip install --upgrade yt-dlp
 
 pause

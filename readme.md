@@ -7,6 +7,11 @@ A simple Python tool to download videos using `yt-dlp`.
 3.	Extract ffmpeg.exe and ffprobe.exe from the bin folder of the zip and drop them into the project folder.
 4.	In the project folder run start.bat. If you don’t have venv, it will create one and install dependencies from requirements.txt.
 
+## OS compatibility:
+✅ Windows 11 (Windows 10 should be ok too)
+❓ Linux - haven't tested
+❓ MacOS - haven't tested
+
 ## How to use it
 Select a folder where to save files. By default "downloads" folder will be created in the project folder.
 
